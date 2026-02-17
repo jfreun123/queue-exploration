@@ -1,20 +1,68 @@
 # queue-exploration
 
-This is the queue-exploration project.
+A minimal C++23 project with static analysis and formatting tools.
 
-# Building and installing
+## Features
 
-See the [BUILDING](BUILDING.md) document.
+- **C++23** standard
+- **Clang compiler** with strict warnings
+- **Static Analysis**: clang-tidy, cppcheck
+- **Code Formatting**: clang-format (LLVM style)
+- **Testing**: CTest integration
+- **Build System**: CMake with presets
 
-# Contributing
+## Building
 
-See the [CONTRIBUTING](CONTRIBUTING.md) document.
+### Prerequisites
 
-# Licensing
+- CMake 3.14+
+- Clang++ (C++23 support)
+- Ninja build system
+- clang-tidy
+- cppcheck
+- clang-format
 
-<!--
-Please go to https://choosealicense.com/licenses/ and choose a license that
-fits your needs. The recommended license for a project of this type is the
-GNU AGPLv3.
--->
-# queue-exploration
+Install on Ubuntu/Debian:
+```bash
+sudo apt-get install cmake clang ninja-build clang-tidy cppcheck clang-format
+```
+
+### Build Commands
+
+```bash
+# Configure
+cmake --preset=dev
+
+# Build
+cmake --build --preset=dev
+
+# Test
+ctest --preset=dev
+
+# Format code
+cmake --build build -t format-fix
+
+# Check formatting
+cmake --build build -t format-check
+```
+
+## Project Structure
+
+```
+queue-exploration/
+├── source/           # Source code
+│   ├── lib.cpp
+│   ├── lib.hpp
+│   └── main.cpp
+├── test/             # Tests
+│   └── source/
+│       └── queue-exploration_test.cpp
+├── cmake/            # CMake modules
+│   ├── dev-mode.cmake
+│   └── lint-targets.cmake
+└── CMakeLists.txt    # Main build file
+```
+
+## License
+
+[Choose a license](https://choosealicense.com/licenses/)
