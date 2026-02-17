@@ -6,6 +6,10 @@ if(BUILD_TESTING)
   add_subdirectory(test)
 endif()
 
+# ---- Benchmark ----
+
+add_subdirectory(benchmark)
+
 # ---- Linting (clang-format) ----
 
 include(cmake/lint-targets.cmake)
