@@ -51,12 +51,11 @@ cmake --build build -t format-check
 ```
 queue-exploration/
 ├── source/           # Source code
-│   ├── lib.cpp
-│   ├── lib.hpp
+│   ├── slow_queue.hpp
 │   └── main.cpp
 ├── test/             # Tests
 │   └── source/
-│       └── queue-exploration_test.cpp
+│       └── slow_queue_test.cpp
 ├── cmake/            # CMake modules
 │   ├── dev-mode.cmake
 │   └── lint-targets.cmake
