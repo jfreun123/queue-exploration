@@ -1,23 +1,10 @@
-include(cmake/folders.cmake)
+# ---- Tests ----
 
 include(CTest)
 if(BUILD_TESTING)
   add_subdirectory(test)
 endif()
 
-add_custom_target(
-    run-exe
-    COMMAND queue-exploration_exe
-    VERBATIM
-)
-add_dependencies(run-exe queue-exploration_exe)
-
-option(ENABLE_COVERAGE "Enable coverage support separate from CTest's" OFF)
-if(ENABLE_COVERAGE)
-  include(cmake/coverage.cmake)
-endif()
+# ---- Linting (clang-format) ----
 
 include(cmake/lint-targets.cmake)
-include(cmake/spell-targets.cmake)
-
-add_folders(Project)

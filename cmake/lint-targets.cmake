@@ -1,33 +1,26 @@
 set(
     FORMAT_PATTERNS
     source/*.cpp source/*.hpp
-    include/*.hpp
     test/*.cpp test/*.hpp
     CACHE STRING
-    "; separated patterns relative to the project source dir to format"
+    "Patterns to format"
 )
 
-set(FORMAT_COMMAND clang-format CACHE STRING "Formatter to use")
+# Find all files matching the patterns
+file(GLOB_RECURSE FORMAT_FILES ${FORMAT_PATTERNS})
 
 add_custom_target(
     format-check
-    COMMAND "${CMAKE_COMMAND}"
-    -D "FORMAT_COMMAND=${FORMAT_COMMAND}"
-    -D "PATTERNS=${FORMAT_PATTERNS}"
-    -P "${PROJECT_SOURCE_DIR}/cmake/lint.cmake"
+    COMMAND clang-format --dry-run --Werror ${FORMAT_FILES}
     WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
-    COMMENT "Linting the code"
+    COMMENT "Checking code formatting"
     VERBATIM
 )
 
 add_custom_target(
     format-fix
-    COMMAND "${CMAKE_COMMAND}"
-    -D "FORMAT_COMMAND=${FORMAT_COMMAND}"
-    -D "PATTERNS=${FORMAT_PATTERNS}"
-    -D FIX=YES
-    -P "${PROJECT_SOURCE_DIR}/cmake/lint.cmake"
+    COMMAND clang-format -i ${FORMAT_FILES}
     WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
-    COMMENT "Fixing the code"
+    COMMENT "Fixing code formatting"
     VERBATIM
 )

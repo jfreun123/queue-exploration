@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.14)
 
-include(cmake/prelude.cmake)
+# ---- In-source guard ----
+
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
+  message(FATAL_ERROR "In-source builds are not allowed. Please create a build directory.")
+endif()
 
 project(
     queue-exploration
@@ -10,8 +14,9 @@ project(
     LANGUAGES CXX
 )
 
-include(cmake/project-is-top-level.cmake)
-include(cmake/variables.cmake)
+# ---- Developer mode ----
+
+option(queue-exploration_DEVELOPER_MODE "Enable developer mode" ON)
 
 # ---- Declare library ----
 
@@ -21,7 +26,7 @@ add_library(
 )
 
 target_include_directories(
-    queue-exploration_lib ${warning_guard}
+    queue-exploration_lib
     PUBLIC
     "\$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/source>"
 )
@@ -39,21 +44,8 @@ target_compile_features(queue-exploration_exe PRIVATE cxx_std_20)
 
 target_link_libraries(queue-exploration_exe PRIVATE queue-exploration_lib)
 
-# ---- Install rules ----
+# ---- Developer mode targets ----
 
-if(NOT CMAKE_SKIP_INSTALL_RULES)
-  include(cmake/install-rules.cmake)
+if(queue-exploration_DEVELOPER_MODE)
+  include(cmake/dev-mode.cmake)
 endif()
-
-# ---- Developer mode ----
-
-if(NOT queue-exploration_DEVELOPER_MODE)
-  return()
-elseif(NOT PROJECT_IS_TOP_LEVEL)
-  message(
-      AUTHOR_WARNING
-      "Developer mode is intended for developers of queue-exploration"
-  )
-endif()
-
-include(cmake/dev-mode.cmake)
