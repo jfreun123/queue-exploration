@@ -1,8 +1,7 @@
 #include "lib.hpp"
+#include <gtest/gtest.h>
 
-auto main() -> int
-{
-  auto const lib = library {};
-
-  return lib.name == "queue-exploration" ? 0 : 1;
+TEST(LibraryTest, NameIsCorrect) {
+  auto const lib = library{};
+  EXPECT_EQ(lib.name, "queue-exploration");
 }

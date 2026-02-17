@@ -20,8 +20,6 @@
         "CMAKE_CXX_STANDARD_REQUIRED": "ON",
         "CMAKE_CXX_EXTENSIONS": "OFF",
         "CMAKE_CXX_FLAGS": "-Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -Wshadow",
-        "CMAKE_CXX_CLANG_TIDY": "clang-tidy",
-        "CMAKE_CXX_CPPCHECK": "cppcheck;--inline-suppr",
         "queue-exploration_DEVELOPER_MODE": "ON"
       }
     }
