@@ -51,7 +51,9 @@ def plot(data: dict[str, dict[int, int]], output_path: str) -> None:
     ax.legend()
     ax.grid(axis="x", linestyle="--", alpha=0.5)
     ax.xaxis.set_major_formatter(
-        plt.FuncFormatter(lambda val, _: f"{val / 1e7:.1f}×10⁷" if val >= 1e7 else f"{val:,.0f}")
+        plt.FuncFormatter(
+            lambda val, _: f"{val / 1e7:.1f}×10⁷" if val >= 1e7 else f"{val:,.0f}"
+        )
     )
 
     fig.tight_layout()
@@ -65,7 +67,9 @@ def main() -> None:
         sys.exit(1)
 
     csv_path = sys.argv[1]
-    png_path = sys.argv[2] if len(sys.argv) > 2 else str(Path(csv_path).with_suffix(".png"))
+    png_path = (
+        sys.argv[2] if len(sys.argv) > 2 else str(Path(csv_path).with_suffix(".png"))
+    )
 
     plot(load(csv_path), png_path)
 
