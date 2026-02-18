@@ -2,7 +2,9 @@
 #include <atomic>
 #include <chrono>
 #include <cstdint>
+#include <functional>
 #include <iostream>
+#include <string_view>
 #include <thread>
 #include <vector>
 
@@ -11,10 +13,9 @@ namespace {
 constexpr int kMaxReaders = 8;
 constexpr int kDurationMs = 2000;
 constexpr std::uint64_t kMicrosecondsPerSecond = 1'000'000ULL;
-constexpr const char *kQueueName = "SlowQueueTS";
 
-std::uint64_t run(int num_readers) {
-  CustomQueues::SlowQueueTS<int> queue;
+template <typename Queue> std::uint64_t run(int num_readers) {
+  Queue queue;
   std::atomic<bool> running{true};
   std::vector<std::uint64_t> counts(static_cast<size_t>(num_readers), 0U);
 
@@ -64,14 +65,26 @@ std::uint64_t run(int num_readers) {
          static_cast<std::uint64_t>(elapsed_us);
 }
 
+struct BenchEntry {
+  std::string_view name;
+  std::function<std::uint64_t(int)> bench;
+};
+
+// Add new queue implementations here.
+const std::vector<BenchEntry> kQueues = {
+    {"SlowQueueTS", run<CustomQueues::SlowQueueTS<int>>},
+};
+
 } // namespace
 
 int main() {
   std::cout << "queue_name,num_readers,messages_per_second\n";
-  for (int num_readers = 1; num_readers <= kMaxReaders; ++num_readers) {
-    std::uint64_t msgs_per_sec = run(num_readers);
-    std::cout << kQueueName << "," << num_readers << "," << msgs_per_sec
-              << "\n";
+  for (const auto &entry : kQueues) {
+    for (int num_readers = 1; num_readers <= kMaxReaders; ++num_readers) {
+      std::uint64_t msgs_per_sec = entry.bench(num_readers);
+      std::cout << entry.name << "," << num_readers << "," << msgs_per_sec
+                << "\n";
+    }
   }
   return 0;
 }
