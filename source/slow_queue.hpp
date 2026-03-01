@@ -43,4 +43,25 @@ private:
   std::queue<T> queue_;
 };
 
+template <typename T> class SlowProducer {
+public:
+  explicit SlowProducer(SlowQueueTS<T> *q) : mQ(q) {}
+
+  void Push(const T &value) { mQ->push(value); }
+  void Push(T &&value) { mQ->push(std::move(value)); }
+
+private:
+  SlowQueueTS<T> *mQ;
+};
+
+template <typename T> class SlowConsumer {
+public:
+  explicit SlowConsumer(SlowQueueTS<T> *q) : mQ(q) {}
+
+  std::optional<T> TryPop() { return mQ->pop(); }
+
+private:
+  SlowQueueTS<T> *mQ;
+};
+
 } // namespace CustomQueues
