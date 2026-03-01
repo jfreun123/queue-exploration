@@ -4,6 +4,8 @@
 .vscode/
 build/
 build-bench/
+build-asan/
+build-tsan/
 cmake-build-*/
 prefix/
 .clangd
