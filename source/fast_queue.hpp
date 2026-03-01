@@ -21,22 +21,25 @@ struct FastQueue {
   // [ReadCounter,WriteCounter] defines the area where data is being written to
   alignas(CACHE_LINE_SIZE) std::atomic<uint64_t> mWriteCounter{0};
 
-  alignas(CACHE_LINE_SIZE) uint8_t mBuffer[];
+  [[nodiscard]] uint8_t *buffer() noexcept {
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+    return reinterpret_cast<uint8_t *>(this) + sizeof(FastQueue);
+  }
 };
 
 class QProducer {
 public:
-  explicit QProducer(FastQueue *q) : mQ(q), mNextElement(q->mBuffer) {}
+  explicit QProducer(FastQueue *q) : mQ(q), mNextElement(q->buffer()) {}
 
   void Write(std::span<const std::byte> buffer) {
     const int32_t size = static_cast<int32_t>(buffer.size());
-    const int32_t payloadSize = sizeof(int32_t) + size;
+    const int32_t payloadSize = static_cast<int32_t>(sizeof(int32_t)) + size;
 
-    mLocalCounter += payloadSize;
+    mLocalCounter += static_cast<uint64_t>(payloadSize);
     mQ->mWriteCounter.store(mLocalCounter, std::memory_order_release);
 
     std::memcpy(mNextElement, &size, sizeof(int32_t));
-    std::memcpy(mNextElement + sizeof(int32_t), buffer.data(), size);
+    std::memcpy(mNextElement + sizeof(int32_t), buffer.data(), static_cast<size_t>(size));
 
     mQ->mReadCounter.store(mLocalCounter, std::memory_order_release);
     mNextElement += payloadSize;
@@ -51,7 +54,7 @@ private:
 class QConsumer {
 public:
   explicit QConsumer(FastQueue *q, uint64_t queueSize)
-      : mQ(q), mQueueSize(queueSize), mNextElement(q->mBuffer) {}
+      : mQ(q), mQueueSize(queueSize), mNextElement(q->buffer()) {}
 
   int32_t TryRead(std::span<std::byte> buffer) {
     if (mLocalCounter == mQ->mReadCounter.load(std::memory_order_acquire))
@@ -65,10 +68,10 @@ public:
     EXPECT(size <= static_cast<int32_t>(buffer.size()),
            "buffer space isn't large enough");
 
-    std::memcpy(buffer.data(), mNextElement + sizeof(int32_t), size);
+    std::memcpy(buffer.data(), mNextElement + sizeof(int32_t), static_cast<size_t>(size));
 
-    const int32_t payloadSize = sizeof(int32_t) + size;
-    mLocalCounter += payloadSize;
+    const int32_t payloadSize = static_cast<int32_t>(sizeof(int32_t)) + size;
+    mLocalCounter += static_cast<uint64_t>(payloadSize);
     mNextElement += payloadSize;
 
     writeCounter = mQ->mWriteCounter.load(std::memory_order_acquire);
